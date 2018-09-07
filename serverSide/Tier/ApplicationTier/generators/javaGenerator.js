@@ -15,16 +15,15 @@ module.exports = class JavaGenerator {
 
     constructor() {
       this.code = '';
-      this.metodi = ''; 
+      this.metodi = '';
     }
 
     generate(data) {
         if(data.length > 0) {
 
-          //this.code += ('package com.javax.persistence;\n\n');
-		  this.code += ('package com.jurassicswe.ironworks;\n\n');
-          //this.code += ('import javax.xml.crypto.Data;\n\n');
-
+		  this.code += ('package ironworks;\n\n');
+		  
+		  this.code += ('import java.util.Date;\n');
 		  this.code += ('import java.io.Serializable;\n');
 		  this.code += ('import javax.persistence.*;\n\n');
 		  /*
@@ -42,11 +41,15 @@ module.exports = class JavaGenerator {
               this.code += ('@Entity\n');
               this.code += ('class ' + entity.name + ' implements Serializable {');
 
+			  let pk = false;
+			  
               if(entity.attr.length > 0) {
                 this.code += ('\n\n');
 
                 for(let i = 0; i < entity.attr.length; i++) {
                     let attribute = entity.attr[i];
+					if(attribute.primaryKey === 'true')
+						pk = true;
                     this.newField(
                         attribute.scope,
                         attribute.array,
@@ -58,10 +61,14 @@ module.exports = class JavaGenerator {
 
                 this.code += ('\n' + this.metodi + '\n');
               }
-              else {
-                this.code += ('\n\n   @Id @GeneratedValue\n');
+			  if(entity.attr.length === 0)
+				this.code += ('\n\n');
+              if((entity.attr.length === 0) || (!pk)) {
+                this.code += ('   @Id @GeneratedValue\n');
                 this.code += ('   @Column(name = "id")\n');
-                this.code += ('   private int id;\n\n');
+                this.code += ('   private int id;\n');
+                this.code += ('   private int getId() {return id;}\n');
+                this.code += ('   private void setId(int auxid) {this.id=auxid;}\n\n');
               }
               this.code += ('}\n\n');
               this.metodi = '';
@@ -100,22 +107,31 @@ module.exports = class JavaGenerator {
 
     generateMain(data) {
 
-          //this.code += ('package com.javax.persistence;\n\n');
-		  this.code += ('package com.jurassicswe.ironworks;\n\n');
+		  this.code += ('package ironworks;\n\n');
+		  
+		  this.code += ('import java.util.Date;\n\n');
 
           this.code += ('import org.hibernate.Session;\n');
           this.code += ('import org.hibernate.SessionFactory;\n');
           this.code += ('import org.hibernate.Transaction;\n');
           this.code += ('import org.hibernate.cfg.Configuration;\n\n');
-
+		  
           this.code += ('public class StoreData {\n\tpublic static void main(String[] args) {\n');
-          this.code += ('\n\t\tConfiguration cfg=new Configuration(); \n');
+          this.code += ('\n\t\tConfiguration cfg = new Configuration(); \n');
           this.code += ('\t\tcfg.configure("hibernate.cfg.xml");\n');
-          this.code += ('\t\tSessionFactory factory=cfg.buildSessionFactory();\n');
-          this.code += ('\t\tSession session=factory.openSession();\n');
-          this.code += ('\t\tTransaction t=session.beginTransaction();\n');
-          this.code += ('\n\t\t//Inserire qui la creazione degli oggetti\n\n');
+          this.code += ('\t\tSessionFactory factory = cfg.buildSessionFactory();\n');
+          this.code += ('\t\tSession session = factory.openSession();\n');
+          this.code += ('\t\tTransaction t = session.beginTransaction();\n\n');
+		  
+          this.code += ('\t\t//Inserire qui il codice per la manipolazione degli oggetti\n\n');
+		  this.code += ('\t\t/*\n\t\t * Esempio:\n');
+		  this.code += ('\t\t * MyEntity foo = new MyEntity();\n');
+		  this.code += ('\t\t * foo.setAttr("bar");\n');
+		  this.code += ('\t\t * session.save(foo);\n');
+		  this.code += ('\t\t */\n\n');
+		  
           this.code += ('\t\tt.commit();\n');
+          this.code += ('\t\tfactory.close();\n');
           this.code += ('\t\tsession.close();\n\n');
           this.code += ('\t}\n');
           this.code += ('}\n');
