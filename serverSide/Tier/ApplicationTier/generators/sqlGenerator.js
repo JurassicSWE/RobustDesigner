@@ -27,7 +27,7 @@ module.exports = class sqlGenerator {
 
             this.code += ('DROP TABLE IF EXISTS '+ entity.name +';\n');
 
-            this.code += ('CREATE TABLE ' + entity.name + '( \n');
+            this.code += ('CREATE TABLE ' + entity.name + ' (\n');
 
             if(entity.attr.length > 0) {
               let pk = false;
@@ -52,9 +52,9 @@ module.exports = class sqlGenerator {
               this.code += ('\n');
             }
             else {
-              this.code += ('id INT AUTO_INCREMENT PRIMARY KEY \n');
+              this.code += ('id INT AUTO_INCREMENT PRIMARY KEY\n');
             }
-            this.code += (');\n\n');
+            this.code += (') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\n');
         }
 
         let aux = this.code;
@@ -67,20 +67,20 @@ module.exports = class sqlGenerator {
       }
   }
 
-  newField(name, type,  primaryKey) {
+  newField(name, type, primaryKey) {
       this.code += (name + ' ');
       if(type === 'String')
-      this.code += ('VARCHAR(30) ');
+      this.code += ('VARCHAR(30)');
       if(type === 'Integer')
-      this.code += ('INT(6) ');
+      this.code += ('INT(6)');
       if(type === 'Double')
-      this.code += ('FLOAT(16) ');
+      this.code += ('FLOAT(16)');
       if(type === 'Data')
-      this.code += ('DATE ');
+      this.code += ('DATE');
       if(type === 'Boolean')
-      this.code += ('BOOLEAN ');
+      this.code += ('BOOLEAN');
       if(type === 'Array')
-      this.code += ('TEXT ');
+      this.code += ('TEXT');
       if(primaryKey === 'true'){
           this.code += (' PRIMARY KEY');
       }
